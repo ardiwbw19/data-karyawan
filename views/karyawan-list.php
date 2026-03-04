@@ -166,7 +166,88 @@
     <?php endif; ?>
 </div>
 
-<div class="modal fade" id="modalHapusKaryawan" tabindex="-1" aria-labelledby="modalHapusKaryawanLabel" aria-hidden="true" style="z-index:1080;">
+<style>
+    #modalHapusKaryawan {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: none;
+        width: 100%;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        padding: 1rem;
+        z-index: 1080;
+    }
+
+    #modalHapusKaryawan.show {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #modalHapusKaryawan .modal-dialog {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        margin: auto;
+    }
+
+    #modalHapusKaryawan .modal-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        background: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 0.3rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+    }
+
+    #modalHapusKaryawan .modal-header,
+    #modalHapusKaryawan .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+    }
+
+    #modalHapusKaryawan .modal-header {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    #modalHapusKaryawan .modal-body {
+        padding: 1rem;
+    }
+
+    #modalHapusKaryawan .modal-footer {
+        justify-content: flex-end;
+        gap: 0.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: #000;
+        z-index: 1070;
+    }
+
+    .modal-backdrop.fade {
+        opacity: 0;
+    }
+
+    .modal-backdrop.show {
+        opacity: 0.5;
+    }
+</style>
+
+<div class="modal fade" id="modalHapusKaryawan" tabindex="-1" aria-labelledby="modalHapusKaryawanLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
