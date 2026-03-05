@@ -37,6 +37,19 @@ $formAction = $isEdit ? ('index.php?action=update&id=' . (int) ($id ?? 0)) : 'in
                 </div>
 
                 <div class="col-md-6 mb-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select id="gender" name="gender" class="form-select <?= isset($errors['gender']) ? 'is-invalid' : ''; ?>">
+                        <option value="Laki-Laki" <?= (($formData['gender'] ?? 'Laki-Laki') === 'Laki-Laki') ? 'selected' : ''; ?>>Laki-Laki</option>
+                        <option value="Perempuan" <?= (($formData['gender'] ?? '') === 'Perempuan') ? 'selected' : ''; ?>>Perempuan</option>
+                    </select>
+                    <?php if (isset($errors['gender'])): ?>
+                        <div class="invalid-feedback"><?= e($errors['gender']); ?></div>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
                     <label for="id_jabatan" class="form-label">Jabatan</label>
                     <select id="id_jabatan" name="id_jabatan" class="form-select <?= isset($errors['id_jabatan']) ? 'is-invalid' : ''; ?>">
                         <option value="">-- Pilih Jabatan --</option>
@@ -51,6 +64,17 @@ $formAction = $isEdit ? ('index.php?action=update&id=' . (int) ($id ?? 0)) : 'in
                     </select>
                     <?php if (isset($errors['id_jabatan'])): ?>
                         <div class="invalid-feedback"><?= e($errors['id_jabatan']); ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select <?= isset($errors['status']) ? 'is-invalid' : ''; ?>">
+                        <option value="active" <?= (($formData['status'] ?? '') === 'active') ? 'selected' : ''; ?>>Active</option>
+                        <option value="inactive" <?= (($formData['status'] ?? '') === 'inactive') ? 'selected' : ''; ?>>Inactive</option>
+                    </select>
+                    <?php if (isset($errors['status'])): ?>
+                        <div class="invalid-feedback"><?= e($errors['status']); ?></div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -69,17 +93,6 @@ $formAction = $isEdit ? ('index.php?action=update&id=' . (int) ($id ?? 0)) : 'in
             </div>
 
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select <?= isset($errors['status']) ? 'is-invalid' : ''; ?>">
-                        <option value="active" <?= (($formData['status'] ?? '') === 'active') ? 'selected' : ''; ?>>Active</option>
-                        <option value="inactive" <?= (($formData['status'] ?? '') === 'inactive') ? 'selected' : ''; ?>>Inactive</option>
-                    </select>
-                    <?php if (isset($errors['status'])): ?>
-                        <div class="invalid-feedback"><?= e($errors['status']); ?></div>
-                    <?php endif; ?>
-                </div>
-
                 <div class="col-md-6 mb-3">
                     <label for="foto" class="form-label">Foto (opsional)</label>
                     <input type="file" id="foto" name="foto" accept="image/jpeg,image/png,image/webp" class="form-control <?= isset($errors['foto']) ? 'is-invalid' : ''; ?>">

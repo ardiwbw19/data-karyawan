@@ -27,10 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        if (authenticate_user($username, $password)) {
+        $authenticatedUser = authenticate_user($username, $password);
+
+        if ($authenticatedUser !== null) {
+            session_regenerate_id(true);
             $_SESSION['user'] = [
-                'name' => 'Administrator',
-                'username' => $username,
+                'id' => $authenticatedUser['id'],
+                'name' => $authenticatedUser['username'],
+                'username' => $authenticatedUser['username'],
+                'role' => $authenticatedUser['role'],
             ];
 
             set_flash('success', 'Login berhasil.');

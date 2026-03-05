@@ -5,10 +5,12 @@
     </div>
 
     <div class="d-flex flex-wrap gap-2">
-        <a href="index.php?action=create" class="btn btn-primary">
-            <i class="align-middle me-1" data-feather="plus"></i>
-            Tambah Karyawan
-        </a>
+        <?php if ($canManageKaryawan): ?>
+            <a href="index.php?action=create" class="btn btn-primary">
+                <i class="align-middle me-1" data-feather="plus"></i>
+                Tambah Karyawan
+            </a>
+        <?php endif; ?>
         <a href="export.php?type=excel<?= $keyword !== '' ? '&q=' . urlencode($keyword) : ''; ?><?= $filterJabatanId !== null ? '&id_jabatan=' . $filterJabatanId : ''; ?>" class="btn btn-success">
             <i class="align-middle me-1" data-feather="file-text"></i>
             Export Excel
@@ -61,16 +63,19 @@
                     <th style="width: 50px;">No</th>
                     <th style="width: 72px;">Foto</th>
                     <th>Nama</th>
+                    <th>Gender</th>
                     <th>Jabatan</th>
                     <th>Status</th>
                     <th>Alamat</th>
-                    <th style="width: 160px;">Aksi</th>
+                    <?php if ($canManageKaryawan): ?>
+                        <th style="width: 160px;">Aksi</th>
+                    <?php endif; ?>
                 </tr>
                 </thead>
                 <tbody>
                 <?php if (empty($rows)): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-4">Belum ada data karyawan.</td>
+                        <td colspan="<?= $canManageKaryawan ? '8' : '7'; ?>" class="text-center py-4">Belum ada data karyawan.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($rows as $index => $row): ?>
@@ -87,6 +92,7 @@
                                 <img src="<?= e($fotoUrl); ?>" alt="Foto" class="rounded" style="width:48px;height:48px;object-fit:cover;">
                             </td>
                             <td><?= e($row['nama']); ?></td>
+                            <td><?= e($row['gender'] ?? '-'); ?></td>
                             <td><?= e($row['nama_jabatan']); ?></td>
                             <td>
                                 <?php if (($row['status'] ?? '') === 'active'): ?>
@@ -96,21 +102,23 @@
                                 <?php endif; ?>
                             </td>
                             <td><?= e($row['alamat']); ?></td>
-                            <td>
-                                <div class="d-flex gap-1 flex-wrap">
-                                    <a href="index.php?action=edit&id=<?= (int) $row['id']; ?>" class="btn btn-sm btn-warning">Edit</a>
-                                    <button
-                                        type="button"
-                                        class="btn btn-sm btn-danger js-btn-delete"
-                                        data-id="<?= (int) $row['id']; ?>"
-                                        data-nama="<?= e($row['nama']); ?>"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#modalHapusKaryawan"
-                                    >
-                                        Hapus
-                                    </button>
-                                </div>
-                            </td>
+                            <?php if ($canManageKaryawan): ?>
+                                <td>
+                                    <div class="d-flex gap-1 flex-wrap">
+                                        <a href="index.php?action=edit&id=<?= (int) $row['id']; ?>" class="btn btn-sm btn-warning">Edit</a>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-danger js-btn-delete"
+                                            data-id="<?= (int) $row['id']; ?>"
+                                            data-nama="<?= e($row['nama']); ?>"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalHapusKaryawan"
+                                        >
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -166,129 +174,131 @@
     <?php endif; ?>
 </div>
 
-<style>
-    #modalHapusKaryawan {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        display: none;
-        width: 100%;
-        height: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-        padding: 1rem;
-        z-index: 1080;
-    }
+<?php if ($canManageKaryawan): ?>
+    <style>
+        #modalHapusKaryawan {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: none;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+            padding: 1rem;
+            z-index: 1080;
+        }
 
-    #modalHapusKaryawan.show {
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
+        #modalHapusKaryawan.show {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
 
-    #modalHapusKaryawan .modal-dialog {
-        position: relative;
-        width: 100%;
-        max-width: 500px;
-        margin: auto;
-    }
+        #modalHapusKaryawan .modal-dialog {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+        }
 
-    #modalHapusKaryawan .modal-content {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        background: #fff;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 0.3rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
-    }
+        #modalHapusKaryawan .modal-content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 0.3rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        }
 
-    #modalHapusKaryawan .modal-header,
-    #modalHapusKaryawan .modal-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.75rem 1rem;
-    }
+        #modalHapusKaryawan .modal-header,
+        #modalHapusKaryawan .modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+        }
 
-    #modalHapusKaryawan .modal-header {
-        border-bottom: 1px solid #dee2e6;
-    }
+        #modalHapusKaryawan .modal-header {
+            border-bottom: 1px solid #dee2e6;
+        }
 
-    #modalHapusKaryawan .modal-body {
-        padding: 1rem;
-    }
+        #modalHapusKaryawan .modal-body {
+            padding: 1rem;
+        }
 
-    #modalHapusKaryawan .modal-footer {
-        justify-content: flex-end;
-        gap: 0.5rem;
-        border-top: 1px solid #dee2e6;
-    }
+        #modalHapusKaryawan .modal-footer {
+            justify-content: flex-end;
+            gap: 0.5rem;
+            border-top: 1px solid #dee2e6;
+        }
 
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        background-color: #000;
-        z-index: 1070;
-    }
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: #000;
+            z-index: 1070;
+        }
 
-    .modal-backdrop.fade {
-        opacity: 0;
-    }
+        .modal-backdrop.fade {
+            opacity: 0;
+        }
 
-    .modal-backdrop.show {
-        opacity: 0.5;
-    }
-</style>
+        .modal-backdrop.show {
+            opacity: 0.5;
+        }
+    </style>
 
-<div class="modal fade" id="modalHapusKaryawan" tabindex="-1" aria-labelledby="modalHapusKaryawanLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalHapusKaryawanLabel">Konfirmasi Hapus</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Data karyawan <strong id="namaKaryawanHapus">-</strong> akan dihapus permanen. Lanjutkan?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                <a href="#" id="linkKonfirmasiHapus" class="btn btn-danger">Ya, Hapus</a>
+    <div class="modal fade" id="modalHapusKaryawan" tabindex="-1" aria-labelledby="modalHapusKaryawanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalHapusKaryawanLabel">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Data karyawan <strong id="namaKaryawanHapus">-</strong> akan dihapus permanen. Lanjutkan?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <a href="#" id="linkKonfirmasiHapus" class="btn btn-danger">Ya, Hapus</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteButtons = document.querySelectorAll('.js-btn-delete');
-        const deleteName = document.getElementById('namaKaryawanHapus');
-        const deleteLink = document.getElementById('linkKonfirmasiHapus');
-        const deleteModal = document.getElementById('modalHapusKaryawan');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.js-btn-delete');
+            const deleteName = document.getElementById('namaKaryawanHapus');
+            const deleteLink = document.getElementById('linkKonfirmasiHapus');
+            const deleteModal = document.getElementById('modalHapusKaryawan');
 
-        if (deleteModal && deleteModal.parentElement !== document.body) {
-            document.body.appendChild(deleteModal);
-        }
+            if (deleteModal && deleteModal.parentElement !== document.body) {
+                document.body.appendChild(deleteModal);
+            }
 
-        deleteButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                const id = button.getAttribute('data-id') || '';
-                const nama = button.getAttribute('data-nama') || '-';
+            deleteButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const id = button.getAttribute('data-id') || '';
+                    const nama = button.getAttribute('data-nama') || '-';
 
-                if (deleteName) {
-                    deleteName.textContent = nama;
-                }
+                    if (deleteName) {
+                        deleteName.textContent = nama;
+                    }
 
-                if (deleteLink) {
-                    deleteLink.setAttribute('href', 'index.php?action=delete&id=' + encodeURIComponent(id));
-                }
+                    if (deleteLink) {
+                        deleteLink.setAttribute('href', 'index.php?action=delete&id=' + encodeURIComponent(id));
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
+<?php endif; ?>

@@ -9,6 +9,14 @@ require_once __DIR__ . '/includes/fungsi.php';
 require_login();
 
 $action = $_GET['action'] ?? 'list';
+$canManageKaryawan = is_admin();
+
+$adminOnlyActions = ['create', 'store', 'edit', 'update', 'delete'];
+if (in_array($action, $adminOnlyActions, true) && !$canManageKaryawan) {
+    set_flash('danger', 'Anda tidak memiliki akses untuk mengelola data karyawan.');
+    redirect('index.php');
+}
+
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $keyword = trim((string) ($_GET['q'] ?? ''));
 $filterJabatanId = null;
@@ -26,6 +34,7 @@ $errors = [];
 $formData = [
     'nama' => '',
     'id_jabatan' => '',
+    'gender' => 'Laki-Laki',
     'alamat' => '',
     'status' => 'active',
     'foto' => '',

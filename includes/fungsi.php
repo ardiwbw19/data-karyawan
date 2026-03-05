@@ -47,12 +47,28 @@ function require_login(): void
     }
 }
 
+function current_user_role(): ?string
+{
+    if (!is_logged_in()) {
+        return null;
+    }
+
+    $role = trim((string) ($_SESSION['user']['role'] ?? ''));
+    return $role === '' ? null : $role;
+}
+
+function is_admin(): bool
+{
+    return current_user_role() === 'admin';
+}
+
 function validate_karyawan_input(array $input): array
 {
     $errors = [];
 
     $nama = trim((string) ($input['nama'] ?? ''));
     $idJabatan = filter_var($input['id_jabatan'] ?? null, FILTER_VALIDATE_INT);
+    $gender = trim((string) ($input['gender'] ?? ''));
     $alamat = trim((string) ($input['alamat'] ?? ''));
     $status = trim((string) ($input['status'] ?? ''));
 
@@ -70,6 +86,10 @@ function validate_karyawan_input(array $input): array
         $errors['id_jabatan'] = 'Jabatan tidak valid.';
     }
 
+    if (!in_array($gender, ['Laki-Laki', 'Perempuan'], true)) {
+        $errors['gender'] = 'Gender tidak valid.';
+    }
+
     if ($alamat === '') {
         $errors['alamat'] = 'Alamat wajib diisi.';
     } elseif (mb_strlen($alamat) < 5) {
@@ -85,6 +105,7 @@ function validate_karyawan_input(array $input): array
         'clean' => [
             'nama' => $nama,
             'id_jabatan' => (int) $idJabatan,
+            'gender' => $gender,
             'alamat' => $alamat,
             'status' => $status,
         ],
@@ -176,7 +197,7 @@ function get_jabatan_name_by_id(int $idJabatan): ?string
 
 function get_karyawan(int $id): ?array
 {
-    $sql = 'SELECT k.id, k.nama, k.id_jabatan, j.nama_jabatan, k.alamat, k.foto, k.status
+    $sql = 'SELECT k.id, k.nama, k.id_jabatan, k.gender, j.nama_jabatan, k.alamat, k.foto, k.status
             FROM tbl_karyawan k
             INNER JOIN tbl_jabatan j ON j.id_jabatan = k.id_jabatan
             WHERE k.id = :id
@@ -221,7 +242,7 @@ function get_karyawan_list(string $keyword = '', int $page = 1, int $perPage = 1
 {
     $offset = ($page - 1) * $perPage;
 
-    $sql = 'SELECT k.id, k.nama, j.nama_jabatan, k.alamat, k.foto, k.status, k.updated_at
+    $sql = 'SELECT k.id, k.nama, k.gender, j.nama_jabatan, k.alamat, k.foto, k.status, k.updated_at
             FROM tbl_karyawan k
             INNER JOIN tbl_jabatan j ON j.id_jabatan = k.id_jabatan';
 
@@ -303,14 +324,15 @@ function get_karyawan_export_list(string $keyword = '', ?int $filterJabatanId = 
 
 function create_karyawan(array $data): bool
 {
-    $sql = 'INSERT INTO tbl_karyawan (nama, id_jabatan, alamat, foto, status)
-            VALUES (:nama, :id_jabatan, :alamat, :foto, :status)';
+    $sql = 'INSERT INTO tbl_karyawan (nama, id_jabatan, gender, alamat, foto, status)
+            VALUES (:nama, :id_jabatan, :gender, :alamat, :foto, :status)';
 
     $stmt = db_connect()->prepare($sql);
 
     return $stmt->execute([
         'nama' => $data['nama'],
         'id_jabatan' => $data['id_jabatan'],
+        'gender' => $data['gender'],
         'alamat' => $data['alamat'],
         'foto' => $data['foto'] ?? '',
         'status' => $data['status'],
@@ -322,6 +344,7 @@ function update_karyawan(int $id, array $data): bool
     $sql = 'UPDATE tbl_karyawan
             SET nama = :nama,
                 id_jabatan = :id_jabatan,
+                gender = :gender,
                 alamat = :alamat,
                 foto = :foto,
                 status = :status,
@@ -334,6 +357,7 @@ function update_karyawan(int $id, array $data): bool
         'id' => $id,
         'nama' => $data['nama'],
         'id_jabatan' => $data['id_jabatan'],
+        'gender' => $data['gender'],
         'alamat' => $data['alamat'],
         'foto' => $data['foto'] ?? '',
         'status' => $data['status'],
